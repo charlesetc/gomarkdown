@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gomarkdown/markdown/html"
-	"github.com/gomarkdown/markdown/parser"
+	"github.com/charlesetc/gomarkdown/html"
+	"github.com/charlesetc/gomarkdown/parser"
 )
 
 func must(err error) {

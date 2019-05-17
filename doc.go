@@ -16,9 +16,9 @@ Customizing parsing and HTML rendering
 You can customize parser and HTML renderer:
 
 	import (
-		"github.com/gomarkdown/markdown/parser"
-		"github.com/gomarkdown/markdown/renderer"
-		"github.com/gomarkdown/markdown"
+		"github.com/charlesetc/gomarkdown/parser"
+		"github.com/charlesetc/gomarkdown/renderer"
+		"github.com/charlesetc/gomarkdown"
 	)
 	extensions := parser.CommonExtensions | parser.AutoHeadingIDs
 	p := parser.NewWithExensions(extensions)

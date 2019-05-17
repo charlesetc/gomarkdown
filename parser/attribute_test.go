@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/gomarkdown/markdown/ast"
+	"github.com/charlesetc/gomarkdown/ast"
 )
 
 func TestBlockAttribute(t *testing.T) {
