@@ -4,6 +4,10 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"math/rand"
+	"os"
+	"os/exec"
 	"regexp"
 	"sort"
 	"strconv"
@@ -908,6 +912,40 @@ func (r *Renderer) index(w io.Writer, node *ast.Index) {
 	r.outs(w, "</span>")
 }
 
+func renderKatex(display bool, math []byte) []byte {
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+
+	// create a temp file
+	var tmpfile = fmt.Sprintf("/tmp/out%d.txt", rand.Int()%9999999)
+	defer func() {
+		err := os.Remove(tmpfile)
+		if err != nil {
+			panic(err)
+		}
+	}()
+	// write the math to it
+	err := ioutil.WriteFile(tmpfile, math, 0666)
+	if err != nil {
+		panic(err)
+	}
+	// run katex against it
+	var cmd *exec.Cmd
+	if display {
+		cmd = exec.Command("katex", "-d", "-i", tmpfile)
+	} else {
+		cmd = exec.Command("katex", "-i", tmpfile)
+	}
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	if err := cmd.Run(); err != nil {
+		// Maybe insert this cleverly into the output?
+		fmt.Println("Got error while trying to parse latex", err)
+		panic(err)
+	}
+	return out.Bytes()
+}
+
 // RenderNode renders a markdown node to HTML
 func (r *Renderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.WalkStatus {
 	if r.opts.RenderNodeHook != nil {
@@ -986,14 +1024,17 @@ func (r *Renderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.Wal
 	case *ast.TableFooter:
 		r.outOneOfCr(w, entering, "<tfoot>", "</tfoot>")
 	case *ast.Math:
-		r.outOneOf(w, true, `<span class="math inline">\(`, `\)</span>`)
-		EscapeHTML(w, node.Literal)
-		r.outOneOf(w, false, `<span class="math inline">\(`, `\)</span>`)
+
+		// r.outOneOf(w, true, `<span class="math inline">\(`, `\)</span>`)
+		r.out(w, renderKatex(false, node.Literal))
+		// EscapeHTML(w, node.Literal)
+		// r.outOneOf(w, false, `<span class="math inline">\(`, `\)</span>`)
 	case *ast.MathBlock:
-		r.outOneOf(w, entering, `<p><span class="math display">\[`, `\]</span></p>`)
+		// r.outOneOf(w, entering, `<p><span class="math display">\[`, `\]</span></p>`)
 		if entering {
-			EscapeHTML(w, node.Literal)
+			r.out(w, renderKatex(true, node.Literal))
 		}
+		// EscapeHTML(w, node.Literal)
 	case *ast.DocumentMatter:
 		r.matter(w, node, entering)
 	case *ast.Callout:
