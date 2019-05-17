@@ -1026,11 +1026,13 @@ func (r *Renderer) RenderNode(w io.Writer, node ast.Node, entering bool) ast.Wal
 	case *ast.Math:
 
 		// r.outOneOf(w, true, `<span class="math inline">\(`, `\)</span>`)
+		fmt.Println("RENDERING MATH")
 		r.out(w, renderKatex(false, node.Literal))
 		// EscapeHTML(w, node.Literal)
 		// r.outOneOf(w, false, `<span class="math inline">\(`, `\)</span>`)
 	case *ast.MathBlock:
 		// r.outOneOf(w, entering, `<p><span class="math display">\[`, `\]</span></p>`)
+		fmt.Println("RENDERING MATH BLOCk")
 		if entering {
 			r.out(w, renderKatex(true, node.Literal))
 		}
