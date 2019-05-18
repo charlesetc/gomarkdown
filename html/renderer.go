@@ -940,8 +940,8 @@ func renderKatex(display bool, math []byte) []byte {
 	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
 		// Maybe insert this cleverly into the output?
-		fmt.Println("Got error while trying to parse latex", err)
-		panic(err)
+		fmt.Println("error while trying to parse latex", err)
+		return []byte("<blockquote>" + stderr.String() + "</blockquote>")
 	}
 	return out.Bytes()
 }
