@@ -932,16 +932,15 @@ func renderKatex(display bool, math []byte) []byte {
 	// run katex against it
 	var cmd *exec.Cmd
 	if display {
-		cmd = exec.Command("katex", "-d", "-i", tmpfile)
+		cmd = exec.Command("katex", "-t", "-d", "-i", tmpfile)
 	} else {
-		cmd = exec.Command("katex", "-i", tmpfile)
+		cmd = exec.Command("katex", "-t", "-i", tmpfile)
 	}
 	cmd.Stdout = &out
 	cmd.Stderr = &stderr
 	if err := cmd.Run(); err != nil {
 		// Maybe insert this cleverly into the output?
-		fmt.Println("error while trying to parse latex", err)
-		return []byte("<blockquote>" + stderr.String() + "</blockquote>")
+		panic("got an error:" + err.Error() + "\n" + stderr.String())
 	}
 	return out.Bytes()
 }
